@@ -1,0 +1,22 @@
+{
+  "name": "lioncount-best",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Lioncount personalized food discovery starter",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "argon2": "^0.41.1",
+    "better-sqlite3": "^11.8.1",
+    "connect-sqlite3": "^0.9.15",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0"
+  }
+}

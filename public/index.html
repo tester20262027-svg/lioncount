@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lioncount — Food discovery, made personal</title>
+<meta name="description" content="Explore food ideas ranked against your own preferences, with clear pros and cons.">
+<style>
+:root{color-scheme:dark;--bg:#0c1118;--panel:#151e29;--panel2:#1c2835;--line:#2b3948;--text:#f5f4ef;--muted:#a9b6c4;--gold:#e7b85c;--green:#9bd0aa;--red:#e5a2a2;--blue:#a8b9ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 78% -12%,#a9793030,transparent 42%),var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{width:min(1120px,calc(100% - 36px));margin:auto}header{height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:850;font-size:21px;letter-spacing:.02em}.brand b{display:inline-grid;place-items:center;background:linear-gradient(145deg,#f5d991,#b8792f);color:#21180b;width:38px;height:38px;border-radius:12px;margin-right:9px}
+button{cursor:pointer;border:0;border-radius:10px;padding:10px 15px;font:inherit;font-weight:700;background:var(--gold);color:#241b0d}button.secondary{background:#263443;color:var(--text);border:1px solid var(--line)}button:disabled{opacity:.55;cursor:not-allowed}
+.hero{text-align:center;padding:58px 0 28px}.eyebrow{color:var(--gold);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}
+h1{font-size:clamp(38px,6vw,62px);line-height:1.02;letter-spacing:-.05em;margin:14px 0}.muted{color:var(--muted)}.hero p{max-width:650px;margin:0 auto;color:var(--muted);font-size:16px}
+.panel{background:linear-gradient(150deg,#1a2633,#131b25);border:1px solid var(--line);border-radius:18px;padding:21px;box-shadow:0 20px 60px #0003}
+.auth{max-width:530px;margin:20px auto 60px}.tabs{display:flex;gap:8px;margin:18px 0}.tabs button{flex:1}
+label{display:block;font-weight:700;font-size:13px;margin:13px 0 6px}input,textarea,select{width:100%;border:1px solid var(--line);background:#0e151d;color:var(--text);border-radius:10px;padding:11px;font:inherit}textarea{min-height:70px;resize:vertical}
+.error{color:#ffabab;min-height:22px;font-size:13px}.hint,.small{font-size:12px;color:var(--muted)}
+.dashboard{padding:10px 0 55px}.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.wide{grid-column:1/-1}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.profile-item{background:#101821;border:1px solid var(--line);border-radius:12px;padding:12px}.profile-item b{display:block;color:var(--gold);font-size:12px;margin-bottom:5px}.profile-item span{color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}.toolbar select{width:auto;min-width:150px}
+.food-list{display:grid;gap:12px}.food{background:#101821;border:1px solid var(--line);border-radius:14px;padding:15px}.food-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.food h3{margin:0 0 3px;font-size:17px}.score{white-space:nowrap;color:var(--gold);font-weight:800}.bar{height:6px;background:#2b3948;border-radius:9px;margin:12px 0;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#d7a54a,#f3d58f);border-radius:9px}
+.procon{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}.procon div{font-size:12px;color:var(--muted)}.procon strong{display:block;margin-bottom:5px}.procon .pros strong{color:var(--green)}.procon .cons strong{color:var(--red)}
+.chip{display:inline-block;border:1px solid #46536a;border-radius:20px;padding:3px 8px;font-size:11px;color:#cbd5e5;margin:3px 3px 0 0}
+footer{text-align:center;color:#778698;border-top:1px solid var(--line);padding:24px;font-size:12px}
+.hidden{display:none!important}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.hero{padding-top:40px}.topline{align-items:flex-start;flex-direction:column}}
+@media(max-width:500px){.profile-grid,.procon{grid-template-columns:1fr}.wrap{width:calc(100% - 24px)}.panel{padding:16px}}
+</style></head><body>
+<header class="wrap"><div class="brand"><b>♌</b>lioncount</div><div id="headerUser" class="small">Your food, your preferences</div></header>
+<section class="hero wrap"><div class="eyebrow">Personalized food discovery</div><h1>Find food that fits you.</h1><p>Compare ideas against your preferences. See what matches, what may not, and the trade-offs before you choose.</p></section>
+
+<section class="panel auth" id="authPanel">
+<h2 id="authTitle">Welcome to Lioncount</h2><p class="muted" id="authDesc">Sign in with a username and password. No email required.</p>
+<div class="tabs"><button id="loginTab">Log in</button><button id="registerTab" class="secondary">Create account</button></div>
+<form id="authForm"><label for="username">Username</label><input id="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" autocomplete="username" placeholder="3–24 letters, numbers, underscores"><label for="password">Password</label><input id="password" type="password" required minlength="12" maxlength="128" autocomplete="current-password" placeholder="At least 12 characters"><p class="hint">Use a unique password. There is no email-based password reset in this starter.</p><p class="error" id="authError"></p><button id="authSubmit">Log in</button></form>
+</section>
+
+<main class="wrap dashboard hidden" id="dashboard">
+<div class="topline"><div><div class="eyebrow">Your personal food space</div><h2 id="hello">Hello!</h2></div><div><button class="secondary" id="editProfile">Edit preferences</button> <button class="secondary" id="logout">Log out</button></div></div>
+<div class="grid">
+<section class="panel"><h2>Your profile</h2><p class="muted small">Update these details at any time. They are stored with your account.</p><div class="profile-grid">
+<div class="profile-item"><b>Dietary goals</b><span id="vGoals">Not added</span></div>
+<div class="profile-item"><b>Restrictions / avoid</b><span id="vRestrictions">Not added</span></div>
+<div class="profile-item"><b>Favorites</b><span id="vFavorites">Not added</span></div>
+<div class="profile-item"><b>Least favorites</b><span id="vLeast">Not added</span></div></div></section>
+<section class="panel"><h2>How ranking works</h2><p class="muted">Lioncount estimates how closely each idea matches the preferences you saved. It is a guide for comparing options, not a health score or a guarantee that a food is suitable.</p><div class="small"><span class="chip">Preference match</span><span class="chip">Favorites</span><span class="chip">Dislikes</span><span class="chip">Restrictions check</span></div><p class="small">A possible allergy or restriction match is flagged for review and is never treated as safe based on this demo alone.</p></section>
+<section class="panel wide"><h2>Food idea rankings</h2><p class="muted">These are illustrative sample ideas. Change your profile to see how preference matches affect their order.</p><div class="toolbar"><label for="sortMode" style="margin:0">Rank by</label><select id="sortMode"><option value="match">Best preference match</option><option value="balanced">Pros and cons balance</option><option value="alpha">Name A–Z</option></select><button class="secondary" id="refreshRank">Re-rank ideas</button></div><div class="food-list" id="foodList"></div><p class="hint">Scores are a transparent, simple demo heuristic based on text matches in your profile. They are not nutritional ratings. Always check labels and ask food providers about allergens and cross-contact.</p></section>
+<section class="panel wide"><h2>Edit your food profile</h2><p class="muted">Your profile is private to your account. Share only what you are comfortable saving.</p>
+<form id="profileForm"><label for="displayName">Name</label><input id="displayName" required maxlength="70"><label for="goals">Dietary goals</label><textarea id="goals" placeholder="For example: explore balanced meals, cook more often, find convenient lunches"></textarea><label for="restrictions">Dietary restrictions / ingredients to avoid</label><textarea id="restrictions" placeholder="For example: vegetarian, peanuts, lactose"></textarea><label for="favorites">Favorite cuisines or foods</label><textarea id="favorites" placeholder="For example: Thai, pasta, mango"></textarea><label for="least">Least favorite foods</label><textarea id="least" placeholder="For example: olives, mushrooms"></textarea><p class="error" id="profileError"></p><button>Save preferences</button></form>
+</section>
+</div></main>
+<footer>lioncount · Your preferences, your choices</footer>
+
+<script>
+let mode="login", profile={};
+const $=id=>document.getElementById(id);
+async function api(url,opts={}){const r=await fetch(url,{credentials:"same-origin",headers:{"Content-Type":"application/json"},...opts});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
+function setMode(m){mode=m;$("loginTab").classList.toggle("secondary",m!=="login");$("registerTab").classList.toggle("secondary",m!=="register");$("authTitle").textContent=m==="login"?"Welcome back":"Create your Lioncount account";$("authDesc").textContent=m==="login"?"Sign in with a username and password.":"Choose a username and password. No email required.";$("authSubmit").textContent=m==="login"?"Log in":"Create account";$("password").autocomplete=m==="login"?"current-password":"new-password";$("authError").textContent=""}
+$("loginTab").onclick=()=>setMode("login");$("registerTab").onclick=()=>setMode("register");
+$("authForm").onsubmit=async e=>{e.preventDefault();$("authError").textContent="";try{await api("/api/"+mode,{method:"POST",body:JSON.stringify({username:$("username").value,password:$("password").value})});await loadApp()}catch(err){$("authError").textContent=err.message}};
+async function loadApp(){const me=await api("/api/me");const d=await api("/api/profile");profile=d.profile||{};$("authPanel").classList.add("hidden");$("dashboard").classList.remove("hidden");$("headerUser").textContent="Signed in: "+me.user.username;fillForm();renderProfile();rankFoods()}
+function fillForm(){$("displayName").value=profile.name||"";$("goals").value=profile.goals||"";$("restrictions").value=profile.restrictions||"";$("favorites").value=profile.favorites||"";$("least").value=profile.leastFavorites||""}
+function renderProfile(){$("hello").textContent="Hello, "+(profile.name||"there");$("vGoals").textContent=profile.goals||"Not added";$("vRestrictions").textContent=profile.restrictions||"Not added";$("vFavorites").textContent=profile.favorites||"Not added";$("vLeast").textContent=profile.leastFavorites||"Not added"}
+$("editProfile").onclick=()=>$("profileForm").scrollIntoView({behavior:"smooth",block:"center"});
+$("profileForm").onsubmit=async e=>{e.preventDefault();$("profileError").textContent="";try{await api("/api/profile",{method:"PUT",body:JSON.stringify({name:$("displayName").value,goals:$("goals").value,restrictions:$("restrictions").value,favorites:$("favorites").value,leastFavorites:$("least").value})});profile=(await api("/api/profile")).profile;renderProfile();rankFoods();$("profileError").textContent="Saved. Your rankings have been updated."}catch(err){$("profileError").textContent=err.message}};
+$("logout").onclick=async()=>{await api("/api/logout",{method:"POST"});location.reload()};
+const foods=[
+{name:"Chickpea & avocado bowl",tags:["chickpea","avocado","vegetarian","vegan","mediterranean"],pros:["Plant-based protein and fiber from chickpeas","Flexible: add vegetables, grains, or dressing"],cons:["May not suit a legume or chickpea restriction","Some toppings or dressings may contain allergens"]},
+{name:"Vegetable tofu stir-fry",tags:["tofu","vegetable","vegetarian","vegan","asian","thai"],pros:["Easy to customize with preferred vegetables","Can be served with rice or noodles"],cons:["Soy is a major allergen for some people","Sauces can contain wheat, sesame, or other allergens"]},
+{name:"Tomato basil pasta",tags:["pasta","tomato","italian","vegetarian"],pros:["Familiar ingredients and easy to adapt","Can add beans or vegetables"],cons:["Traditional pasta contains wheat","Cheese may contain dairy"]},
+{name:"Chicken rice bowl",tags:["chicken","rice","protein"],pros:["Adaptable with different vegetables and sauces","Rice is naturally gluten-free"],cons:["Not suitable for vegetarian preferences","Sauces and seasonings need ingredient checks"]},
+{name:"Black bean tacos",tags:["black bean","beans","mexican","vegetarian","vegan","taco"],pros:["Beans provide plant-based protein and fiber","Toppings can be selected individually"],cons:["Beans may not work for every digestive preference","Check tortillas and toppings for relevant allergens"]},
+{name:"Mushroom risotto",tags:["mushroom","rice","italian","vegetarian"],pros:["Can be made with a range of vegetables","Rice-based dish"],cons:["Contains mushroom, a common dislike for some people","Often includes dairy; recipes vary"]}
+];
+function words(s){return (s||"").toLowerCase().split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean)}
+function matchCount(tags,terms){return terms.filter(t=>tags.some(tag=>tag.includes(t)||t.includes(tag))).length}
+function scoreFood(food){
+ const fav=words(profile.favorites), least=words(profile.leastFavorites), goals=words(profile.goals), restrictions=words(profile.restrictions);
+ const f=matchCount(food.tags,fav), l=matchCount(food.tags,least), g=matchCount(food.tags,goals);
+ // Restrictions are flagged for human verification, never inferred as medically safe.
+ const flags=restrictions.filter(r=>food.tags.some(t=>t.includes(r)||r.includes(t)));
+ const raw=50+f*13+g*5-l*18;
+ const score=Math.max(0,Math.min(100,raw));
+ const pros=[...food.pros];const cons=[...food.cons];
+ if(f)pros.unshift("Matches "+f+" favorite preference"+(f===1?"":"s"));
+ if(g)pros.unshift("Has a keyword related to a stated goal");
+ if(l)cons.unshift("Overlaps with "+l+" least-favorite preference"+(l===1?"":"s"));
+ if(flags.length)cons.unshift("Review possible restriction match: "+flags.join(", "));
+ return {...food,score,pros,cons,flags};
+}
+function rankFoods(){
+ const mode=$("sortMode").value;let list=foods.map(scoreFood);
+ if(mode==="match")list.sort((a,b)=>b.score-a.score);
+ if(mode==="balanced")list.sort((a,b)=>(b.pros.length-b.cons.length)-(a.pros.length-a.cons.length));
+ if(mode==="alpha")list.sort((a,b)=>a.name.localeCompare(b.name));
+ $("foodList").replaceChildren();
+ list.forEach((f,i)=>{
+  const card=document.createElement("article");card.className="food";
+  const head=document.createElement("div");head.className="food-head";
+  const title=document.createElement("div");const h=document.createElement("h3");h.textContent=(i+1)+". "+f.name;const tag=document.createElement("span");tag.className="small";tag.textContent=f.tags.slice(0,4).join(" · ");title.append(h,tag);
+  const score=document.createElement("div");score.className="score";score.textContent=f.score+"% match";head.append(title,score);card.append(head);
+  const bar=document.createElement("div");bar.className="bar";const fill=document.createElement("i");fill.style.width=f.score+"%";bar.append(fill);card.append(bar);
+  if(f.flags.length){const warning=document.createElement("p");warning.className="small";warning.style.color="#ffb5a8";warning.textContent="Restriction check needed — do not assume this option is suitable.";card.append(warning)}
+  const pc=document.createElement("div");pc.className="procon";
+  for(const [cls,label,items] of [["pros","Potential pros",f.pros],["cons","Potential cons",f.cons]]){const box=document.createElement("div");box.className=cls;const strong=document.createElement("strong");strong.textContent=label;const ul=document.createElement("ul");items.forEach(x=>{const li=document.createElement("li");li.textContent=x;ul.append(li)});box.append(strong,ul);pc.append(box)}
+  card.append(pc);$("foodList").append(card);
+ });
+}
+$("sortMode").onchange=rankFoods;$("refreshRank").onclick=rankFoods;
+(async()=>{try{await loadApp()}catch{setMode("login")}})();
+</script></body></html>
